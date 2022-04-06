@@ -1,45 +1,36 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require("cors");
+import React, {Component} from 'react';
+import logo from './logo.svg';
+import './App.css';
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var testAPIRouter = require("./routes/testAPI");  //ADDED FOR NEW ROUTE
+class App extends Component {
+    constructor(props) {
+      super(props);
+      this.state = { apiResponse: '' };
+      this.newVar = {};
+  }
 
-var app = express();
+  callAPI() {
+      fetch('http://localhost:9000/testAPI')
+          .then(res => res.text())
+          .then(res => this.setState({ apiResponse: res }));
+  }
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+  componentWillMount() {
+      this.callAPI();
+  }
 
-app.use(cors());
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+  render() {
+    this.newVar = this.state.apiResponse;
+    return (
+      <div className='App'>
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h1 className="App-link">{this.newVar}</h1>
+        </header>
+        <p className='App-intro'>{this.newVar}</p>
+      </div>
+    );
+  }
+}
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use("/testAPI", testAPIRouter); //ADDED FOR NEW ROUTE
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
+export default App;
